@@ -14,6 +14,7 @@ use crate::{
     error, noalbs,
     state::{self, ClientStatus},
 };
+use crate::error::Error;
 
 use super::{
     obs::{FfmpegSource, SourceItem, VlcSource},
@@ -525,6 +526,14 @@ impl BroadcastingSoftwareLogic for Obsv5 {
             .await?;
 
         Ok((source.source_name.to_owned(), enabled))
+    }
+
+    async fn toggle_mute(&self, source: &str) -> Result<(String, bool), Error> {
+        let connection = self.connection.lock().await;
+        let client = connection.as_ref().ok_or(Error::UnableInitialConnection)?;
+
+        let muted = client.inputs().toggle_mute(source).await?;
+        Ok((source.to_owned(), muted))
     }
 
     async fn set_collection_and_profile(

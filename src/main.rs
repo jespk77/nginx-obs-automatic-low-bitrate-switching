@@ -126,6 +126,7 @@ where
 }
 
 async fn print_if_new_version() -> Result<(), noalbs::error::Error> {
+    /* Disabled update checker since this custom version will never match released version anyway
     let url = "https://api.github.com/repos/715209/nginx-obs-automatic-low-bitrate-switching/releases/latest";
     let dlu = "https://github.com/715209/nginx-obs-automatic-low-bitrate-switching/releases/latest";
     let client = reqwest::Client::new();
@@ -143,7 +144,7 @@ async fn print_if_new_version() -> Result<(), noalbs::error::Error> {
     if !res.tag_name.contains(noalbs::VERSION) {
         println!("NEW VERSION {} AVAILABLE", res.tag_name);
         println!("Download at {}\n", dlu);
-    }
+    }*/
 
     Ok(())
 }

@@ -17,6 +17,7 @@ use crate::{
     config, error, noalbs,
     state::{self, ClientStatus},
 };
+use crate::error::Error;
 
 use super::BroadcastingSoftwareLogic;
 
@@ -585,6 +586,20 @@ impl BroadcastingSoftwareLogic for Obs {
             .await?;
 
         Ok((source.source_name.to_owned(), render))
+    }
+
+    async fn toggle_mute(&self, source: &str) -> Result<(String, bool), Error> {
+        let connection = self.connection.lock().await;
+        let client = connection
+            .as_ref()
+            .ok_or(error::Error::UnableInitialConnection)?;
+
+        let sources = client.sources();
+        let source = source.to_lowercase();
+        let muted = sources.get_mute(&source).await?.muted;
+
+        sources.toggle_mute(&source).await?;
+        Ok((source.to_owned(), !muted))
     }
 
     async fn set_collection_and_profile(

@@ -24,6 +24,8 @@ pub trait BroadcastingSoftwareLogic: Send + Sync {
 
     async fn toggle_source(&self, source: &str) -> Result<(String, bool), Error>;
 
+    async fn toggle_mute(&self, source: &str) -> Result<(String, bool), Error>;
+
     async fn set_collection_and_profile(
         &self,
         source: &crate::config::CollectionPair,

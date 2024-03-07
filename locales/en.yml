@@ -20,6 +20,9 @@ source:
     error: Error toggling source "%{name}"
     enabled: enabled
     disabled: disabled
+mute:
+    success: Input "%{scene}" is now %{muted}
+    error: Error toggling mute on input "%{scene}"
 bitrate:
     success: "%{name}: %{message}"
     error: "No connection :("

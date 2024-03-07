@@ -525,6 +525,7 @@ impl DispatchCommand {
             chat::Command::Start => self.start().await,
             chat::Command::Stop => self.stop(None).await,
             chat::Command::Switch => self.switch(params.next()).await,
+            chat::Command::Mute => self.mute(params.next()).await,
             chat::Command::Trigger => {
                 self.trigger(switcher::TriggerType::Low, params.next())
                     .await
@@ -657,6 +658,23 @@ impl DispatchCommand {
             Err(e) => {
                 error!("{}", e);
                 t!("switch.error", locale = &self.lang, scene = name)
+            }
+        };
+
+        self.send(msg).await;
+    }
+
+    async fn mute(&self, scene: Option<&str>) {
+        let scene = scene.unwrap_or_else(|| "belabox");
+
+        let msg = match self.toggle_mute(scene).await {
+            Ok(result) => {
+                let status = if result.1 { "muted" } else { "unmuted" };
+                t!("mute.success", locale = &self.lang, scene = &result.0, muted = &status)
+            },
+            Err(e) => {
+                error!("{}", e);
+                t!("mute.error", locale = &self.lang, scene = scene)
             }
         };
 
@@ -982,6 +1000,19 @@ impl DispatchCommand {
             .as_ref()
             .ok_or(error::Error::NoSoftwareSet)?
             .switch_scene(scene)
+            .await
+    }
+
+    async fn toggle_mute(&self, scene: &str) -> Result<(String, bool), error::Error> {
+        self.user
+            .state
+            .read()
+            .await
+            .broadcasting_software
+            .connection
+            .as_ref()
+            .ok_or(error::Error::NoSoftwareSet)?
+            .toggle_mute(scene)
             .await
     }
 
